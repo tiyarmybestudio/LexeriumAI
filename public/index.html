@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="en" class="notranslate" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="google" content="notranslate">
+<title>Lexerium AI</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #05060b;
+  --panel: rgba(10, 13, 25, 0.82);
+  --border: rgba(93, 124, 255, 0.18);
+  --blue: #4388ff;
+  --purple: #8b5cf6;
+  --cyan: #22d3ee;
+  --text: #e8ecff;
+  --muted: #737b96;
+  --font-scale: 1;
+}
+
+html, body { height: 100%; }
+
+html { touch-action: manipulation; }
+
+body {
+  min-height: 100vh;
+  overflow: hidden;
+  font-family: Inter, Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(67,136,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(67,136,255,0.035) 1px, transparent 1px);
+  background-size: 45px 45px;
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+body::after {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(67,136,255,0.16), transparent 28%),
+    radial-gradient(circle at 85% 85%, rgba(139,92,246,0.17), transparent 30%),
+    radial-gradient(circle at 50% 45%, rgba(34,211,238,0.035), transparent 35%);
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  width: min(1000px, 94vw);
+  height: min(900px, 92vh);
+  margin: 4vh auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 40px rgba(67,136,255,0.08), 0 30px 100px rgba(0,0,0,0.65);
+  font-size: calc(1em * var(--font-scale));
+}
+
+/* ===== HEADER ===== */
+.header {
+  height: 72px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, rgba(67,136,255,0.06), transparent, rgba(139,92,246,0.06));
+  flex-shrink: 0;
+}
+
+.brand { display: flex; align-items: center; gap: 13px; }
+
+.logo {
+  width: 42px; height: 42px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 0 20px rgba(67,136,255,0.3);
+}
+
+.logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.brand h1 { font-size: 17px; letter-spacing: 1px; }
+.brand p { margin-top: 3px; color: var(--muted); font-size: 11px; }
+
+.header-right { display: flex; align-items: center; gap: 16px; }
+
+.online {
+  display: flex; align-items: center; gap: 7px;
+  color: #8f9bb9; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+.online-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #35e58b; box-shadow: 0 0 10px #35e58b;
+}
+
+.profile-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(124,155,255,0.25);
+  background: rgba(255,255,255,0.05);
+  background-size: cover; background-position: center;
+  color: #dce2f7;
+  font-size: 13px; font-weight: bold;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: .2s;
+  text-transform: uppercase;
+}
+.profile-btn:hover { border-color: rgba(67,136,255,0.6); background: rgba(67,136,255,0.1); }
+
+/* ===== VIEWS ===== */
+.view { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+/* ===== CHAT ===== */
+.chat {
+  flex: 1; overflow-y: auto; padding: 28px;
+  display: flex; flex-direction: column; gap: 18px;
+  scrollbar-width: thin; scrollbar-color: #293455 transparent;
+}
+
+.welcome { margin: auto; max-width: 560px; text-align: center; }
+
+.welcome-icon {
+  width: 76px; height: 76px; margin: 0 auto 20px;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(67,136,255,0.35);
+  background: linear-gradient(135deg, rgba(67,136,255,0.15), rgba(139,92,246,0.15));
+  box-shadow: 0 0 35px rgba(67,136,255,0.1);
+}
+
+.welcome-icon img { width: 60%; height: 60%; object-fit: contain; display: block; }
+
+.welcome h2 { font-size: 27px; letter-spacing: -0.5px; }
+.welcome h2 span { color: var(--blue); text-shadow: 0 0 18px rgba(67,136,255,0.5); }
+.welcome p { margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+.message {
+  display: flex; align-items: flex-start; gap: 10px;
+  max-width: 78%;
+  animation: appear 0.2s ease;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user { align-self: flex-end; flex-direction: row-reverse; }
+
+.avatar {
+  width: 34px; height: 34px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; color: white; font-size: 12px; font-weight: bold;
+  background: linear-gradient(135deg, #367cff, #7649df);
+  background-size: cover; background-position: center;
+  box-shadow: 0 0 15px rgba(67,136,255,0.15);
+  text-transform: uppercase;
+}
+
+.message.user .avatar {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #9aa5c4;
+}
+
+.message-content { display: flex; flex-direction: column; gap: 4px; min-width: 0; max-width: 100%; }
+.message.user .message-content { align-items: flex-end; }
+.message.ai .message-content { align-items: flex-start; }
+
+.sender-name {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 0 4px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bubble {
+  padding: 12px 15px;
+  border-radius: 5px 15px 15px 15px;
+  color: #dce2f7;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.07);
+  font-size: 14px; line-height: 1.65;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+.message.user .bubble {
+  border-radius: 15px 5px 15px 15px;
+  color: white;
+  background: linear-gradient(135deg, rgba(48,113,235,0.85), rgba(112,67,207,0.85));
+  border: 1px solid rgba(124,155,255,0.25);
+  box-shadow: 0 0 20px rgba(67,136,255,0.08);
+}
+
+/* typing bubble - dibuat lebih kecil, hanya cukup untuk 3 titik */
+.bubble.typing-bubble {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 12px;
+  width: fit-content;
+}
+
+.typing { display: flex; gap: 4px; align-items: center; }
+
+.typing span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 8px rgba(67,136,255,0.7);
+  animation: typing 1.1s infinite;
+}
+.typing span:nth-child(2) { animation-delay: .15s; }
+.typing span:nth-child(3) { animation-delay: .3s; }
+
+@keyframes typing {
+  0%, 60%, 100% { opacity: .3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4px); }
+}
+
+/* ===== INPUT ===== */
+.input-area {
+  padding: 15px 20px calc(32px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+  background: rgba(3,5,12,0.45);
+  flex-shrink: 0;
+}
+
+.input-box {
+  display: flex; align-items: flex-end; gap: 9px;
+  padding: 7px;
+  border: 1px solid rgba(91,120,230,0.2);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.035);
+  transition: .2s;
+}
+
+.input-box:focus-within {
+  border-color: rgba(67,136,255,0.55);
+  box-shadow: 0 0 0 3px rgba(67,136,255,0.06), 0 0 25px rgba(67,136,255,0.06);
+}
+
+textarea {
+  flex: 1; min-height: 43px; max-height: 130px; resize: none;
+  padding: 12px 10px; outline: none; border: none;
+  background: transparent; color: white;
+  font-family: inherit;
+  /* font-size 16px mencegah browser mobile (terutama iOS Safari) otomatis zoom saat fokus */
+  font-size: 16px; line-height: 1.4;
+}
+textarea::placeholder { color: #555e78; }
+
+.send {
+  width: 43px; height: 43px; border: none; border-radius: 11px;
+  cursor: pointer; color: white;
+  background: linear-gradient(135deg, #347eff, #7948df);
+  box-shadow: 0 0 15px rgba(67,136,255,0.15);
+  transition: .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.send svg { width: 18px; height: 18px; }
+.send:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(67,136,255,0.3); }
+.send:active { transform: scale(.95); }
+.send:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.hint { margin-top: 8px; text-align: center; color: #464e67; font-size: 10px; letter-spacing: .2px; }
+
+/* ===== PROFILE VIEW ===== */
+.profile-header {
+  height: 60px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(3,5,12,0.3);
+}
+
+.back-btn {
+  width: 34px; height: 34px; border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: #dce2f7; font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: .2s;
+}
+.back-btn:hover { border-color: rgba(67,136,255,0.5); }
+
+.profile-header h2 { font-size: 15px; letter-spacing: .3px; }
+
+.profile-body { flex: 1; overflow-y: auto; padding: 24px 22px; }
+
+.profile-panel { display: none; }
+.profile-panel.active { display: block; }
+
+.user-card {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(67,136,255,0.07), rgba(139,92,246,0.07));
+  margin-bottom: 26px;
+}
+
+.user-avatar-big {
+  position: relative;
+  width: 58px; height: 58px; border-radius: 15px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: bold; color: white; text-transform: uppercase;
+  background: linear-gradient(135deg, #367cff, #7649df);
+  background-size: cover; background-position: center;
+  box-shadow: 0 0 20px rgba(67,136,255,0.2);
+}
+
+.avatar-edit-btn {
+  position: absolute; right: -4px; bottom: -4px;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--bg);
+  background: linear-gradient(135deg, #347eff, #7948df);
+  color: white; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+}
+.avatar-edit-btn svg { width: 11px; height: 11px; }
+
+.user-info { flex: 1; min-width: 0; }
+.user-info h3 { font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-info p { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+.edit-name-row { display: none; gap: 8px; margin-top: 10px; width: 100%; max-width: 100%; }
+.edit-name-row.active { display: flex; }
+
+.edit-name-row input {
+  flex: 1 1 auto; min-width: 0; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid rgba(124,155,255,0.3);
+  background: rgba(0,0,0,0.3); color: white; font-size: 16px; outline: none;
+}
+
+.mini-btn {
+  flex: 0 0 auto; padding: 8px 12px; border-radius: 8px; border: none;
+  font-size: 12px; cursor: pointer; color: white; white-space: nowrap;
+  background: linear-gradient(135deg, #347eff, #7948df);
+}
+
+.edit-link {
+  margin-top: 8px; background: none; border: none;
+  color: var(--cyan); font-size: 11px; cursor: pointer;
+  text-decoration: underline; padding: 0;
+}
+
+.menu-list { display: flex; flex-direction: column; gap: 10px; }
+
+.menu-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 15px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  cursor: pointer; transition: .2s; text-align: left;
+  color: var(--text); font-family: inherit;
+}
+.menu-item:hover { border-color: rgba(67,136,255,0.4); background: rgba(67,136,255,0.06); }
+
+.menu-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(67,136,255,0.12);
+  color: var(--cyan);
+}
+.menu-icon svg { width: 17px; height: 17px; }
+
+.menu-text { flex: 1; }
+.menu-text strong { display: block; font-size: 13px; }
+.menu-text span { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+.menu-arrow { color: var(--muted); font-size: 14px; }
+
+/* ===== AKUN ===== */
+.account-guest-box {
+  text-align: center; padding: 24px 10px; border: 1px solid var(--border);
+  border-radius: 14px; margin-bottom: 18px;
+}
+.account-guest-box p { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+.account-guest-box #googleSignInBtnAccount { display: flex; justify-content: center; }
+
+.account-info-box {
+  display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 14px;
+  border: 1px solid var(--border); margin-bottom: 18px;
+}
+.account-info-box .avatar-mini {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  background: linear-gradient(135deg, #367cff, #7649df); background-size: cover; background-position: center;
+  display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-transform: uppercase;
+}
+.account-info-box .account-info-text { min-width: 0; }
+.account-info-box .account-info-text strong { display: block; font-size: 14px; }
+.account-info-box .account-info-text span { display: block; font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.account-action-btn {
+  width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03); color: #dce2f7; font-size: 13px; font-weight: 600;
+  cursor: pointer; margin-bottom: 10px; text-align: center;
+}
+.account-action-btn.danger { border-color: rgba(255,92,92,0.4); color: #ff8a8a; }
+
+/* settings */
+.setting-group { margin-bottom: 22px; }
+.setting-group label {
+  display: block; font-size: 12px; color: var(--muted); margin-bottom: 8px;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.setting-group select, .setting-group input[type="text"] {
+  width: 100%; padding: 12px 13px; border-radius: 10px;
+  border: 1px solid rgba(124,155,255,0.2);
+  background: rgba(255,255,255,0.04); color: white; font-size: 16px;
+  font-family: inherit; outline: none;
+}
+.setting-group select:focus, .setting-group input:focus { border-color: rgba(67,136,255,0.55); }
+
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; background: rgba(255,255,255,0.02);
+}
+.toggle-row span { font-size: 13px; }
+
+.switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: rgba(255,255,255,0.1); border-radius: 20px; transition: .2s;
+}
+.slider::before {
+  content: ""; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: .2s;
+}
+.switch input:checked + .slider { background: linear-gradient(135deg, #347eff, #7948df); }
+.switch input:checked + .slider::before { transform: translateX(18px); }
+
+/* text panels */
+.text-panel {
+  font-size: 13px; line-height: 1.9; color: #c7cde6;
+}
+.text-panel h4 { font-size: 13px; color: var(--text); margin: 18px 0 8px; }
+.text-panel h4:first-child { margin-top: 0; }
+.text-panel p { margin-bottom: 4px; }
+
+.cs-card {
+  padding: 18px; border-radius: 14px; border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03); margin-top: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.cs-card p { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+.action-btn {
+  padding: 12px 16px; border-radius: 10px; border: none;
+  color: white; font-size: 13px; font-weight: 500; cursor: pointer;
+  background: linear-gradient(135deg, #347eff, #7948df);
+  box-shadow: 0 0 15px rgba(67,136,255,0.15);
+  transition: .2s; text-align: center;
+}
+.action-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(67,136,255,0.3); }
+
+/* ===== LOGIN MODAL ===== */
+.login-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(3,5,12,0.72);
+  backdrop-filter: blur(6px);
+  padding: 24px;
+}
+.login-overlay.active { display: flex; }
+
+.login-card {
+  width: min(360px, 100%);
+  padding: 28px 24px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  text-align: center;
+  box-shadow: 0 30px 100px rgba(0,0,0,0.6);
+}
+
+.login-card h3 { font-size: 17px; margin-bottom: 8px; }
+.login-card p { font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+.login-card #googleSignInBtn { display: flex; justify-content: center; }
+
+.attach-btn, .mic-btn {
+  width: 40px; height: 40px; border: none; border-radius: 11px;
+  cursor: pointer; color: #9aa5c4; flex-shrink: 0;
+  background: rgba(255,255,255,0.04);
+  transition: .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.attach-btn:hover, .mic-btn:hover { background: rgba(67,136,255,0.12); color: #dce2f7; }
+.attach-btn svg, .mic-btn svg { width: 17px; height: 17px; }
+.mic-btn.recording { color: #ff5c5c; background: rgba(255,92,92,0.12); }
+.mic-btn.recording svg { animation: pulseRec 1s infinite; }
+@keyframes pulseRec { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+.image-preview-row { display: none; padding: 0 7px 7px; }
+.image-preview-row.active { display: flex; }
+.image-preview-chip {
+  position: relative; width: 56px; height: 56px; border-radius: 10px; overflow: hidden;
+  border: 1px solid rgba(124,155,255,0.3);
+}
+.image-preview-chip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.image-preview-remove {
+  position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(0,0,0,0.65); color: white; border: none; font-size: 11px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; line-height: 1;
+}
+
+.bubble img.chat-image {
+  max-width: 220px; border-radius: 10px; display: block; margin-bottom: 6px;
+}
+
+.mic-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; color: var(--muted); margin-bottom: 4px;
+}
+.mic-tag svg { width: 11px; height: 11px; }
+
+.logo { cursor: pointer; }
+
+/* ===== SIDEBAR RIWAYAT CHAT ===== */
+.history-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(3,5,12,0.6);
+  backdrop-filter: blur(3px);
+  display: none;
+}
+.history-overlay.active { display: block; }
+
+.history-sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: min(300px, 84vw);
+  background: var(--panel); border-right: 1px solid var(--border);
+  z-index: 61; display: flex; flex-direction: column;
+  transform: translateX(-100%); transition: transform .25s ease;
+}
+.history-overlay.active .history-sidebar { transform: translateX(0); }
+
+.history-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px; border-bottom: 1px solid var(--border);
+}
+.history-header h3 { font-size: 15px; }
+.history-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 4px 8px; }
+
+.new-chat-btn {
+  margin: 12px 16px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(124,155,255,0.3);
+  background: rgba(67,136,255,0.1); color: #dce2f7; font-size: 13px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 8px;
+}
+.new-chat-btn svg { width: 15px; height: 15px; }
+
+.history-list { flex: 1; overflow-y: auto; padding: 0 8px 16px; }
+.history-group-label {
+  font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+  padding: 14px 10px 6px;
+}
+.history-item {
+  width: 100%; text-align: left; padding: 10px 10px; border-radius: 8px; border: none;
+  background: transparent; color: #dce2f7; font-size: 13px; cursor: pointer;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
+}
+.history-item:hover, .history-item.active { background: rgba(67,136,255,0.12); }
+.history-empty { padding: 20px 14px; font-size: 12px; color: var(--muted); text-align: center; }
+
+/* ===== MOBILE ===== */
+@media (max-width: 600px) {
+  body { overflow: hidden; }
+  .app { width: 100vw; height: 100vh; margin: 0; border: none; border-radius: 0; }
+  .header { height: 65px; }
+  .chat { padding: 18px 14px; }
+  .message { max-width: 90%; }
+  .welcome h2 { font-size: 22px; }
+  .welcome-icon { width: 65px; height: 65px; }
+  .input-area { padding: 10px 10px calc(26px + env(safe-area-inset-bottom, 0px)); }
+  .hint { display: none; }
+  .profile-body { padding: 18px 16px; }
+}
+</style>
+</head>
+
+<body class="notranslate" translate="no">
+
+  <div class="app" id="appRoot">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="brand">
+        <!-- GANTI src DI BAWAH INI DENGAN URL LOGO KAMU -->
+        <div class="logo">
+          <img id="logoImg" src="https://placehold.co/84x84/4388ff/ffffff.png?text=L" alt="Lexerium AI">
+        </div>
+        <div>
+          <h1 id="brandTitle">Lexerium AI</h1>
+          <p id="brandSubtitle">AI ASSISTANT // ONLINE</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="online">
+          <span class="online-dot"></span>
+          <span id="onlineLabel">Online</span>
+        </div>
+        <button class="profile-btn" id="headerAvatar" title="Profile">U</button>
+      </div>
+    </header>
+
+    <!-- CHAT VIEW -->
+    <div class="view" id="chatView">
+      <main class="chat" id="chat">
+        <div class="welcome" id="welcome">
+          <!-- GANTI src DI BAWAH INI DENGAN URL LOGO KAMU (bisa sama dengan logo header) -->
+          <div class="welcome-icon">
+            <img src="https://placehold.co/84x84/4388ff/ffffff.png?text=L" alt="Lexerium AI">
+          </div>
+          <h2 id="welcomeHeading">Welcome to <span>Lexerium AI</span></h2>
+          <p id="welcomeText">Ask anything. Get answers, explanations, ideas, and assistance from your AI.</p>
+        </div>
+      </main>
+
+      <div class="input-area">
+        <div class="image-preview-row" id="imagePreviewRow">
+          <div class="image-preview-chip">
+            <img id="imagePreviewThumb" src="" alt="preview">
+            <button class="image-preview-remove" id="imagePreviewRemove" type="button">×</button>
+          </div>
+        </div>
+        <div class="input-box">
+          <button class="attach-btn" id="attachBtn" title="Send photo" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+          </button>
+          <input type="file" id="imageFileInput" accept="image/*" style="display:none">
+          <textarea id="prompt" rows="1" placeholder="Message Lexerium AI..."></textarea>
+          <button class="mic-btn" id="micBtn" title="Voice message" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+          </button>
+          <button id="send" class="send" title="Send">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 12L20 4L14 20L11 13L4 12Z" fill="white"/>
+            </svg>
+          </button>
+        </div>
+        <div class="hint" id="inputHint">ENTER to send • SHIFT + ENTER for new line</div>
+      </div>
+    </div>
+
+    <!-- PROFILE VIEW -->
+    <div class="view" id="profileView" style="display:none">
+      <div class="profile-header">
+        <button class="back-btn" id="profileBack">←</button>
+        <h2 id="profileTitle">Profile</h2>
+      </div>
+
+      <div class="profile-body">
+
+        <!-- HOME -->
+        <div class="profile-panel active" id="panel-home">
+          <div class="user-card">
+            <div class="user-avatar-big" id="bigAvatar">
+              U
+              <button class="avatar-edit-btn" id="avatarEditBtn" title="Change avatar" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+              </button>
+              <input type="file" id="avatarFileInput" accept="image/*" style="display:none">
+            </div>
+            <div class="user-info">
+              <h3 id="displayName">User</h3>
+              <p id="profileSubtitleText">Lexerium AI User</p>
+              <button class="edit-link" id="editNameBtn">Edit name</button>
+              <div class="edit-name-row" id="editNameRow">
+                <input type="text" id="nameInput" maxlength="20" placeholder="Your name">
+                <button class="mini-btn" id="saveNameBtn">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-list">
+            <button class="menu-item" data-panel="panel-account">
+              <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </div>
+              <div class="menu-text"><strong id="menuAccountTitle">Akun</strong><span id="menuAccountDesc">Login, ganti akun, atau hapus akun</span></div>
+              <div class="menu-arrow">›</div>
+            </button>
+
+            <button class="menu-item" data-panel="panel-settings">
+              <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              </div>
+              <div class="menu-text"><strong id="menuSettingsTitle">Settings</strong><span id="menuSettingsDesc">Language, font size, keyboard, etc.</span></div>
+              <div class="menu-arrow">›</div>
+            </button>
+
+            <button class="menu-item" data-panel="panel-tos">
+              <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              </div>
+              <div class="menu-text"><strong id="menuTosTitle">Terms of Service</strong><span id="menuTosDesc">AI function and usage terms</span></div>
+              <div class="menu-arrow">›</div>
+            </button>
+
+            <button class="menu-item" id="reportBtn">
+              <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+              </div>
+              <div class="menu-text"><strong id="menuReportTitle">Report a Problem</strong><span id="menuReportDesc">Found a bug? Let us know via email</span></div>
+              <div class="menu-arrow">›</div>
+            </button>
+
+            <button class="menu-item" data-panel="panel-cs">
+              <div class="menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              </div>
+              <div class="menu-text"><strong id="menuCsTitle">Customer Service</strong><span id="menuCsDesc">Need help? Contact our team</span></div>
+              <div class="menu-arrow">›</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- ACCOUNT -->
+        <div class="profile-panel" id="panel-account">
+          <div id="accountGuestBox" class="account-guest-box" style="display:none">
+            <p id="accountGuestText">Login dengan Google untuk menyimpan riwayat chat dan sinkronkan profil kamu.</p>
+            <div id="googleSignInBtnAccount"></div>
+          </div>
+
+          <div id="accountInfoBox" class="account-info-box" style="display:none">
+            <div class="avatar-mini" id="accountAvatarMini">U</div>
+            <div class="account-info-text">
+              <strong id="accountInfoName">User</strong>
+              <span id="accountInfoEmail">user@email.com</span>
+            </div>
+          </div>
+
+          <div id="accountLoggedInActions" style="display:none">
+            <button class="account-action-btn" id="switchAccountBtn" type="button">
+              <span id="switchAccountLabel">Ganti akun</span>
+            </button>
+            <button class="account-action-btn" id="logoutBtn" type="button">
+              <span id="logoutLabel">Logout</span>
+            </button>
+            <button class="account-action-btn danger" id="deleteAccountBtn" type="button">
+              <span id="deleteAccountLabel">Hapus akun</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="profile-panel" id="panel-settings">
+          <div class="setting-group">
+            <label id="settingsLangLabel">Language</label>
+            <select id="langSelect">
+              <option value="en">English</option>
+              <option value="id">Bahasa Indonesia</option>
+            </select>
+          </div>
+
+          <div class="setting-group">
+            <label id="settingsFontLabel">Font Size</label>
+            <select id="fontSelect">
+              <option value="0.9" id="fontSmallOpt">Small</option>
+              <option value="1" selected id="fontMediumOpt">Medium</option>
+              <option value="1.15" id="fontLargeOpt">Large</option>
+            </select>
+          </div>
+
+          <div class="setting-group">
+            <label id="settingsKeyboardLabel">Keyboard</label>
+            <div class="toggle-row">
+              <span id="enterToggleLabelText">Press ENTER to send message</span>
+              <label class="switch">
+                <input type="checkbox" id="enterToggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- TERMS OF SERVICE -->
+        <div class="profile-panel" id="panel-tos">
+          <div class="text-panel lang-en">
+            <h4>About Lexerium AI</h4>
+            <p>Lexerium AI is an AI assistant that helps answer questions, explain concepts, and provide ideas based on user requests.</p>
+
+            <h4>Service Function</h4>
+            <p>This service provides responses based on an AI language model. The answers given are informative and do not replace professional advice (medical, legal, or financial).</p>
+
+            <h4>Limitations</h4>
+            <p>Lexerium AI may generate answers that are not always accurate. Always verify important information before relying on it.</p>
+
+            <h4>User Data</h4>
+            <p>Conversations may be used to improve service quality. Do not share sensitive personal data in your conversations.</p>
+
+            <h4>Terms of Use</h4>
+            <p>Users are prohibited from using the service for illegal activities, spreading hate, or misusing the system.</p>
+          </div>
+
+          <div class="text-panel lang-id" style="display:none">
+            <h4>Tentang Lexerium AI</h4>
+            <p>Lexerium AI adalah asisten AI yang membantu menjawab pertanyaan, menjelaskan konsep, dan memberikan ide berdasarkan permintaan pengguna.</p>
+
+            <h4>Fungsi Layanan</h4>
+            <p>Layanan ini menyediakan respons berbasis model bahasa AI. Jawaban yang diberikan bersifat informatif dan tidak menggantikan saran profesional (medis, hukum, atau keuangan).</p>
+
+            <h4>Batasan</h4>
+            <p>Lexerium AI dapat menghasilkan jawaban yang tidak selalu akurat. Selalu verifikasi informasi penting sebelum digunakan.</p>
+
+            <h4>Data Pengguna</h4>
+            <p>Percakapan dapat digunakan untuk meningkatkan kualitas layanan. Jangan membagikan data pribadi yang sensitif dalam percakapan.</p>
+
+            <h4>Ketentuan Penggunaan</h4>
+            <p>Pengguna dilarang menggunakan layanan untuk aktivitas ilegal, menyebarkan kebencian, atau menyalahgunakan sistem.</p>
+          </div>
+        </div>
+
+        <!-- CUSTOMER SERVICE -->
+        <div class="profile-panel" id="panel-cs">
+          <div class="text-panel lang-en">
+            <p>Need help using Lexerium AI? Our team is ready to help.</p>
+          </div>
+          <div class="text-panel lang-id" style="display:none">
+            <p>Butuh bantuan seputar penggunaan Lexerium AI? Tim kami siap membantu kamu.</p>
+          </div>
+
+          <div class="cs-card">
+            <p class="lang-en">Send us your question or issue, and our customer service team will respond via email.</p>
+            <p class="lang-id" style="display:none">Kirimkan pertanyaan atau kendala kamu, dan tim customer service akan merespons melalui email.</p>
+            <button class="action-btn" id="csBtn">Contact Customer Service</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR RIWAYAT CHAT -->
+  <div class="history-overlay" id="historyOverlay">
+    <div class="history-sidebar">
+      <div class="history-header">
+        <h3 id="historyTitle">Riwayat Chat</h3>
+        <button class="history-close" id="historyCloseBtn" type="button">×</button>
+      </div>
+      <button class="new-chat-btn" id="newChatBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span id="newChatLabel">Percakapan baru</span>
+      </button>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <h3 id="loginTitle">Login untuk melanjutkan</h3>
+      <p id="loginDesc">Kamu sudah mencoba Lexerium AI. Login dengan Google untuk terus chat dan menyimpan riwayat percakapanmu.</p>
+      <div id="googleSignInBtn"></div>
+    </div>
+  </div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+  const chatBox = document.getElementById("chat");
+  const promptInput = document.getElementById("prompt");
+  const sendButton = document.getElementById("send");
+  const inputHint = document.getElementById("inputHint");
+  const langSelect = document.getElementById("langSelect");
+  const appRoot = document.getElementById("appRoot");
+
+  // ===== STATE =====
+  let username = localStorage.getItem("lx_username") || "User";
+  let enterToSend = true;
+  let avatarDataUrl = localStorage.getItem("lx_avatar") || null;
+  let isLoggedIn = false;
+  let currentUser = null; // { name, email, avatar } dari backend setelah login Google
+  let currentConversationId = null; // percakapan yang sedang dibuka/berjalan
+  const FREE_MESSAGE_LIMIT = 3;
+  function getMsgCount() { return parseInt(localStorage.getItem("lx_msg_count") || "0", 10); }
+  function setMsgCount(n) { localStorage.setItem("lx_msg_count", String(n)); }
+
+  // TEMPEL LINK CATBOX GAMBAR AI KAMU DI SINI (dipakai untuk logo header, welcome icon, dan avatar AI di chat)
+  const LEXERIUM_AI_AVATAR_URL = "https://files.catbox.moe/21fkob.png";
+  if (LEXERIUM_AI_AVATAR_URL) {
+    document.getElementById("logoImg").src = LEXERIUM_AI_AVATAR_URL;
+    const welcomeImg = document.querySelector(".welcome-icon img");
+    if (welcomeImg) welcomeImg.src = LEXERIUM_AI_AVATAR_URL;
+  }
+
+  // GANTI dengan Client ID dari Google Cloud Console (lihat panduan backend)
+  const GOOGLE_CLIENT_ID = "336754790492-ulu55k8ps1opjph4kj124ctbughj55rt.apps.googleusercontent.com";
+
+  // ===== KIRIM FOTO =====
+  let pendingImage = null;
+  let pendingIsAudio = false;
+  const attachBtn = document.getElementById("attachBtn");
+  const imageFileInput = document.getElementById("imageFileInput");
+  const imagePreviewRow = document.getElementById("imagePreviewRow");
+  const imagePreviewThumb = document.getElementById("imagePreviewThumb");
+  const imagePreviewRemove = document.getElementById("imagePreviewRemove");
+
+  attachBtn.addEventListener("click", () => imageFileInput.click());
+
+  imageFileInput.addEventListener("change", () => {
+    const file = imageFileInput.files && imageFileInput.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+    if (file.size > 8 * 1024 * 1024) {
+      alert("Ukuran foto maksimal 8MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      pendingImage = reader.result;
+      imagePreviewThumb.src = pendingImage;
+      imagePreviewRow.classList.add("active");
+    };
+    reader.readAsDataURL(file);
+    imageFileInput.value = "";
+  });
+
+  function clearPendingImage() {
+    pendingImage = null;
+    imagePreviewThumb.src = "";
+    imagePreviewRow.classList.remove("active");
+  }
+  imagePreviewRemove.addEventListener("click", clearPendingImage);
+
+  // ===== CHAT AUDIO (transkrip suara -> teks lewat Web Speech API) =====
+  // Catatan: hanya berjalan di browser berbasis Chromium (Chrome, Edge, dll).
+  // Audio TIDAK dikirim mentah ke server — sudah ditranskripsi jadi teks di browser,
+  // supaya tidak perlu layanan speech-to-text berbayar di backend.
+  const micBtn = document.getElementById("micBtn");
+  const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let isRecording = false;
+
+  if (SpeechRecognitionAPI) {
+    recognition = new SpeechRecognitionAPI();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.addEventListener("result", event => {
+      let transcript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      promptInput.value = transcript;
+      promptInput.style.height = "43px";
+      promptInput.style.height = Math.min(promptInput.scrollHeight, 130) + "px";
+    });
+
+    recognition.addEventListener("end", () => {
+      isRecording = false;
+      micBtn.classList.remove("recording");
+      // Kirim otomatis begitu selesai bicara, jika ada hasil transkrip
+      if (promptInput.value.trim()) {
+        pendingIsAudio = true;
+        sendMessage();
+      }
+    });
+
+    recognition.addEventListener("error", () => {
+      isRecording = false;
+      micBtn.classList.remove("recording");
+    });
+
+    micBtn.addEventListener("click", () => {
+      recognition.lang = currentLang === "id" ? "id-ID" : "en-US";
+      if (isRecording) {
+        recognition.stop();
+        return;
+      }
+      isRecording = true;
+      micBtn.classList.add("recording");
+      pendingIsAudio = false;
+      recognition.start();
+    });
+  } else {
+    micBtn.addEventListener("click", () => {
+      alert("Browser ini belum mendukung input suara. Coba gunakan Chrome.");
+    });
+  }
+
+  // ===== TRANSLATIONS (hanya English & Indonesia, tidak ada bahasa lain) =====
+  const translations = {
+    en: {
+      brandTitle: "Lexerium AI",
+      brandSubtitle: "AI ASSISTANT // ONLINE",
+      online: "Online",
+      welcomeHeadingHTML: 'Welcome to <span>Lexerium AI</span>',
+      welcomeText: "Ask anything. Get answers, explanations, ideas, and assistance from your AI.",
+      placeholder: "Message Lexerium AI...",
+      hintEnter: "ENTER to send • SHIFT + ENTER for new line",
+      hintButton: "Tap send to send • ENTER for new line",
+      profileTitleHome: "Profile",
+      profileTitleSettings: "Settings",
+      profileTitleAccount: "Account",
+      profileTitleTos: "Terms of Service",
+      profileTitleCs: "Customer Service",
+      profileSubtitleText: "Lexerium AI User",
+      editName: "Edit name",
+      saveName: "Save",
+      namePlaceholder: "Your name",
+      menuAccountTitle: "Account",
+      menuAccountDesc: "Login, switch account, or delete account",
+      switchAccountLabel: "Switch account",
+      logoutLabel: "Logout",
+      deleteAccountLabel: "Delete account",
+      accountGuestText: "Login with Google to save your chat history and sync your profile.",
+      historyTitle: "Chat History",
+      newChatLabel: "New chat",
+      historyEmpty: "No conversations yet.",
+      historyEmptyGuest: "Login to save and view your chat history.",
+      historyToday: "Today",
+      historyYesterday: "Yesterday",
+      historyDaysAgo: "{n} days ago",
+      historyOlder: "Older",
+      menuSettingsTitle: "Settings",
+      menuSettingsDesc: "Language, font size, keyboard, etc.",
+      menuTosTitle: "Terms of Service",
+      menuTosDesc: "AI function and usage terms",
+      menuReportTitle: "Report a Problem",
+      menuReportDesc: "Found a bug? Let us know via email",
+      menuCsTitle: "Customer Service",
+      menuCsDesc: "Need help? Contact our team",
+      settingsLangLabel: "Language",
+      settingsFontLabel: "Font Size",
+      fontSmall: "Small",
+      fontMedium: "Medium",
+      fontLarge: "Large",
+      settingsKeyboardLabel: "Keyboard",
+      enterToggleLabelText: "Press ENTER to send message",
+      csButton: "Contact Customer Service",
+      reportSubject: "Bug Report - Lexerium AI",
+      reportBody: "Hello Lexerium AI Team,\n\nI would like to report the following bug:\n\nProblem description: \nSteps to reproduce: \nDevice/Browser: \n\nThank you.",
+      csSubject: "User Support - Lexerium AI",
+      csBody: "Hello Customer Service Team,\n\nI need help with:\n\n",
+      errorConn: "Unable to connect to server.",
+      aiName: "Lexerium AI"
+    },
+    id: {
+      brandTitle: "Lexerium AI",
+      brandSubtitle: "ASISTEN AI // ONLINE",
+      online: "Online",
+      welcomeHeadingHTML: 'Selamat datang di <span>Lexerium AI</span>',
+      welcomeText: "Tanyakan apa saja. Dapatkan jawaban, penjelasan, ide, dan bantuan dari AI kamu.",
+      placeholder: "Kirim pesan ke Lexerium AI...",
+      hintEnter: "ENTER untuk mengirim • SHIFT + ENTER untuk baris baru",
+      hintButton: "Tombol kirim untuk mengirim • ENTER untuk baris baru",
+      profileTitleHome: "Profil",
+      profileTitleSettings: "Pengaturan",
+      profileTitleAccount: "Akun",
+      profileTitleTos: "Ketentuan Layanan",
+      profileTitleCs: "Customer Service",
+      profileSubtitleText: "Pengguna Lexerium AI",
+      editName: "Ubah nama",
+      saveName: "Simpan",
+      namePlaceholder: "Nama kamu",
+      menuAccountTitle: "Akun",
+      menuAccountDesc: "Login, ganti akun, atau hapus akun",
+      switchAccountLabel: "Ganti akun",
+      logoutLabel: "Logout",
+      deleteAccountLabel: "Hapus akun",
+      accountGuestText: "Login dengan Google untuk menyimpan riwayat chat dan sinkronkan profil kamu.",
+      historyTitle: "Riwayat Chat",
+      newChatLabel: "Percakapan baru",
+      historyEmpty: "Belum ada percakapan.",
+      historyEmptyGuest: "Login untuk menyimpan dan melihat riwayat chat kamu.",
+      historyToday: "Hari ini",
+      historyYesterday: "Kemarin",
+      historyDaysAgo: "{n} hari yang lalu",
+      historyOlder: "Lebih lama",
+      menuSettingsTitle: "Pengaturan",
+      menuSettingsDesc: "Bahasa, ukuran font, keyboard, dll",
+      menuTosTitle: "Ketentuan Layanan",
+      menuTosDesc: "Fungsi AI dan ketentuan penggunaan",
+      menuReportTitle: "Laporkan Masalah",
+      menuReportDesc: "Temukan bug? Beri tahu kami lewat email",
+      menuCsTitle: "Customer Service",
+      menuCsDesc: "Butuh bantuan? Hubungi tim kami",
+      settingsLangLabel: "Bahasa",
+      settingsFontLabel: "Ukuran Font",
+      fontSmall: "Kecil",
+      fontMedium: "Sedang",
+      fontLarge: "Besar",
+      settingsKeyboardLabel: "Keyboard",
+      enterToggleLabelText: "Tekan ENTER untuk kirim pesan",
+      csButton: "Hubungi Customer Service",
+      reportSubject: "Laporan Bug - Lexerium AI",
+      reportBody: "Halo Tim Lexerium AI,\n\nSaya ingin melaporkan bug berikut:\n\nDeskripsi masalah: \nLangkah untuk mereproduksi: \nPerangkat/Browser: \n\nTerima kasih.",
+      csSubject: "Bantuan Pengguna - Lexerium AI",
+      csBody: "Halo Tim Customer Service,\n\nSaya butuh bantuan terkait:\n\n",
+      errorConn: "Tidak dapat terhubung ke server.",
+      aiName: "Lexerium AI"
+    }
+  };
+
+  // Deteksi bahasa perangkat - HANYA id atau en, default en (mencegah bahasa lain seperti China muncul)
+  function detectLang() {
+    const deviceLang = (navigator.language || navigator.userLanguage || "en").toLowerCase();
+    return deviceLang.startsWith("id") ? "id" : "en";
+  }
+
+  let currentLang = detectLang();
+
+  const panelTitleKeys = {
+    "panel-home": "profileTitleHome",
+    "panel-account": "profileTitleAccount",
+    "panel-settings": "profileTitleSettings",
+    "panel-tos": "profileTitleTos",
+    "panel-cs": "profileTitleCs"
+  };
+
+  function applyLanguage(lang) {
+    const t = translations[lang] || translations.en;
+    currentLang = lang;
+
+    // penting: set atribut lang dokumen supaya browser tidak salah tebak & tidak menawarkan
+    // auto-translate ke bahasa acak (mis. China) karena mismatch lang tag
+    document.documentElement.setAttribute("lang", lang);
+
+    document.getElementById("brandTitle").textContent = t.brandTitle;
+    document.getElementById("brandSubtitle").textContent = t.brandSubtitle;
+    document.getElementById("onlineLabel").textContent = t.online;
+    document.getElementById("welcomeHeading").innerHTML = t.welcomeHeadingHTML;
+    document.getElementById("welcomeText").textContent = t.welcomeText;
+    promptInput.placeholder = t.placeholder;
+    inputHint.textContent = enterToSend ? t.hintEnter : t.hintButton;
+
+    document.getElementById("profileSubtitleText").textContent = t.profileSubtitleText;
+    document.getElementById("editNameBtn").textContent = t.editName;
+    document.getElementById("saveNameBtn").textContent = t.saveName;
+    document.getElementById("nameInput").placeholder = t.namePlaceholder;
+
+    document.getElementById("menuSettingsTitle").textContent = t.menuSettingsTitle;
+    document.getElementById("menuSettingsDesc").textContent = t.menuSettingsDesc;
+    document.getElementById("menuTosTitle").textContent = t.menuTosTitle;
+    document.getElementById("menuTosDesc").textContent = t.menuTosDesc;
+    document.getElementById("menuReportTitle").textContent = t.menuReportTitle;
+    document.getElementById("menuReportDesc").textContent = t.menuReportDesc;
+    document.getElementById("menuCsTitle").textContent = t.menuCsTitle;
+    document.getElementById("menuCsDesc").textContent = t.menuCsDesc;
+
+    document.getElementById("menuAccountTitle").textContent = t.menuAccountTitle;
+    document.getElementById("menuAccountDesc").textContent = t.menuAccountDesc;
+    document.getElementById("accountGuestText").textContent = t.accountGuestText;
+    document.getElementById("switchAccountLabel").textContent = t.switchAccountLabel;
+    document.getElementById("logoutLabel").textContent = t.logoutLabel;
+    document.getElementById("deleteAccountLabel").textContent = t.deleteAccountLabel;
+    document.getElementById("historyTitle").textContent = t.historyTitle;
+    document.getElementById("newChatLabel").textContent = t.newChatLabel;
+    renderHistoryList();
+
+    document.getElementById("settingsLangLabel").textContent = t.settingsLangLabel;
+    document.getElementById("settingsFontLabel").textContent = t.settingsFontLabel;
+    document.getElementById("fontSmallOpt").textContent = t.fontSmall;
+    document.getElementById("fontMediumOpt").textContent = t.fontMedium;
+    document.getElementById("fontLargeOpt").textContent = t.fontLarge;
+    document.getElementById("settingsKeyboardLabel").textContent = t.settingsKeyboardLabel;
+    document.getElementById("enterToggleLabelText").textContent = t.enterToggleLabelText;
+    document.getElementById("csBtn").textContent = t.csButton;
+
+    document.querySelectorAll(".lang-en").forEach(el => el.style.display = lang === "en" ? "" : "none");
+    document.querySelectorAll(".lang-id").forEach(el => el.style.display = lang === "id" ? "" : "none");
+
+    const activePanel = document.querySelector(".profile-panel.active");
+    if (activePanel) {
+      const key = panelTitleKeys[activePanel.id];
+      if (key) document.getElementById("profileTitle").textContent = t[key];
+    }
+
+    langSelect.value = lang;
+  }
+
+  // ===== NAVIGATION =====
+  const chatView = document.getElementById("chatView");
+  const profileView = document.getElementById("profileView");
+  const profileTitle = document.getElementById("profileTitle");
+
+  let panelStack = ["panel-home"];
+
+  function showPanel(id) {
+    document.querySelectorAll(".profile-panel").forEach(p => p.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    const t = translations[currentLang] || translations.en;
+    const key = panelTitleKeys[id];
+    profileTitle.textContent = key ? t[key] : t.profileTitleHome;
+  }
+
+  document.getElementById("headerAvatar").addEventListener("click", () => {
+    chatView.style.display = "none";
+    profileView.style.display = "flex";
+    panelStack = ["panel-home"];
+    showPanel("panel-home");
+  });
+
+  document.getElementById("profileBack").addEventListener("click", () => {
+    if (panelStack.length > 1) {
+      panelStack.pop();
+      showPanel(panelStack[panelStack.length - 1]);
+    } else {
+      profileView.style.display = "none";
+      chatView.style.display = "flex";
+    }
+  });
+
+  document.querySelectorAll(".menu-item[data-panel]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.getAttribute("data-panel");
+      panelStack.push(target);
+      showPanel(target);
+      if (target === "panel-account") updateAccountPanelUI();
+    });
+  });
+
+  // ===== SIDEBAR RIWAYAT CHAT (dibuka lewat klik logo) =====
+  const historyOverlay = document.getElementById("historyOverlay");
+  const historyList = document.getElementById("historyList");
+  let conversationsCache = [];
+
+  function openHistorySidebar() {
+    historyOverlay.classList.add("active");
+    if (isLoggedIn) loadConversationList();
+    else renderHistoryList();
+  }
+  function closeHistorySidebar() {
+    historyOverlay.classList.remove("active");
+  }
+
+  document.getElementById("logoImg").addEventListener("click", openHistorySidebar);
+  document.getElementById("historyCloseBtn").addEventListener("click", closeHistorySidebar);
+  historyOverlay.addEventListener("click", e => {
+    if (e.target === historyOverlay) closeHistorySidebar();
+  });
+
+  document.getElementById("newChatBtn").addEventListener("click", () => {
+    currentConversationId = null;
+    chatBox.innerHTML = "";
+    const t = translations[currentLang] || translations.en;
+    chatBox.innerHTML = `<div class="welcome" id="welcome">
+      <div class="welcome-icon"><img src="${LEXERIUM_AI_AVATAR_URL || 'https://placehold.co/84x84/4388ff/ffffff.png?text=L'}" alt="Lexerium AI"></div>
+      <h2 id="welcomeHeading">${t.welcomeHeadingHTML}</h2>
+      <p id="welcomeText">${t.welcomeText}</p>
+    </div>`;
+    closeHistorySidebar();
+    renderHistoryList(); // hilangkan status "active" dari item lama
+  });
+
+  function relativeDateLabel(dateStr) {
+    const t = translations[currentLang] || translations.en;
+    const now = new Date();
+    const d = new Date(dateStr);
+    const diffDays = Math.floor((new Date(now.toDateString()) - new Date(d.toDateString())) / 86400000);
+    if (diffDays <= 0) return t.historyToday;
+    if (diffDays === 1) return t.historyYesterday;
+    if (diffDays <= 6) return t.historyDaysAgo.replace("{n}", diffDays);
+    return t.historyOlder;
+  }
+
+  async function loadConversationList() {
+    try {
+      const res = await fetch("/api/conversations", { credentials: "include" });
+      const data = await res.json();
+      conversationsCache = data.success ? data.conversations : [];
+    } catch (err) {
+      conversationsCache = [];
+    }
+    renderHistoryList();
+  }
+
+  function renderHistoryList() {
+    const t = translations[currentLang] || translations.en;
+    historyList.innerHTML = "";
+
+    if (!isLoggedIn) {
+      historyList.innerHTML = `<div class="history-empty">${t.historyEmptyGuest}</div>`;
+      return;
+    }
+    if (!conversationsCache.length) {
+      historyList.innerHTML = `<div class="history-empty">${t.historyEmpty}</div>`;
+      return;
+    }
+
+    let lastGroup = null;
+    conversationsCache.forEach(conv => {
+      const groupLabel = relativeDateLabel(conv.updatedAt);
+      if (groupLabel !== lastGroup) {
+        const label = document.createElement("div");
+        label.className = "history-group-label";
+        label.textContent = groupLabel;
+        historyList.appendChild(label);
+        lastGroup = groupLabel;
+      }
+      const item = document.createElement("button");
+      item.className = "history-item" + (conv.id === currentConversationId ? " active" : "");
+      item.type = "button";
+      item.textContent = conv.title;
+      item.addEventListener("click", () => openConversation(conv.id));
+      historyList.appendChild(item);
+    });
+  }
+
+  async function openConversation(id) {
+    try {
+      const res = await fetch(`/api/conversations/${id}/messages`, { credentials: "include" });
+      const data = await res.json();
+      if (!data.success) return;
+
+      currentConversationId = id;
+      chatBox.innerHTML = "";
+      data.messages.forEach(m => {
+        addMessage(m.content, m.role === "ai" ? "ai" : "user", { imageDataUrl: m.imageUrl, isAudio: m.isAudio });
+      });
+      closeHistorySidebar();
+    } catch (err) {
+      console.error("Gagal membuka percakapan:", err);
+    }
+  }
+
+  // ===== ACCOUNT PANEL =====
+  function updateAccountPanelUI() {
+    const guestBox = document.getElementById("accountGuestBox");
+    const infoBox = document.getElementById("accountInfoBox");
+    const actions = document.getElementById("accountLoggedInActions");
+
+    if (!isLoggedIn) {
+      guestBox.style.display = "block";
+      infoBox.style.display = "none";
+      actions.style.display = "none";
+      return;
+    }
+
+    guestBox.style.display = "none";
+    infoBox.style.display = "flex";
+    actions.style.display = "block";
+
+    document.getElementById("accountInfoName").textContent = currentUser?.name || username;
+    document.getElementById("accountInfoEmail").textContent = currentUser?.email || "";
+    const mini = document.getElementById("accountAvatarMini");
+    if (avatarDataUrl) {
+      mini.style.backgroundImage = `url("${avatarDataUrl}")`;
+      mini.textContent = "";
+    } else {
+      mini.style.backgroundImage = "";
+      mini.textContent = (username.trim().charAt(0) || "U");
+    }
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    } catch (err) { /* tetap lanjut reset UI walau request gagal */ }
+    resetToGuestState();
+  });
+
+  document.getElementById("deleteAccountBtn").addEventListener("click", async () => {
+    const t = translations[currentLang] || translations.en;
+    if (!confirm(currentLang === "id"
+      ? "Yakin hapus akun ini? Semua riwayat chat kamu akan hilang permanen."
+      : "Delete this account? All your chat history will be permanently lost.")) return;
+
+    try {
+      const res = await fetch("/api/user/account", { method: "DELETE", credentials: "include" });
+      const data = await res.json();
+      if (!data.success) {
+        alert(data.message || "Gagal menghapus akun.");
+        return;
+      }
+      resetToGuestState();
+    } catch (err) {
+      alert("Tidak bisa terhubung ke server.");
+    }
+  });
+
+  document.getElementById("switchAccountBtn").addEventListener("click", async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    } catch (err) { /* lanjut walau gagal */ }
+    resetToGuestState();
+    if (window.google && google.accounts && google.accounts.id) {
+      google.accounts.id.disableAutoSelect(); // cegah auto-pilih akun yang sama lagi
+    }
+    showLoginModal();
+  });
+
+  function resetToGuestState() {
+    isLoggedIn = false;
+    currentUser = null;
+    currentConversationId = null;
+    avatarDataUrl = null;
+    username = "User";
+    localStorage.removeItem("lx_avatar");
+    localStorage.removeItem("lx_username");
+    setMsgCount(0);
+    updateAvatarUI();
+    updateAccountPanelUI();
+    conversationsCache = [];
+    renderHistoryList();
+  }
+
+  // ===== USERNAME =====
+  const displayName = document.getElementById("displayName");
+  const bigAvatar = document.getElementById("bigAvatar");
+  const headerAvatar = document.getElementById("headerAvatar");
+  const editNameBtn = document.getElementById("editNameBtn");
+  const editNameRow = document.getElementById("editNameRow");
+  const nameInput = document.getElementById("nameInput");
+  const saveNameBtn = document.getElementById("saveNameBtn");
+
+  function applyAvatarToEl(el, initial) {
+    if (avatarDataUrl) {
+      el.style.backgroundImage = `url("${avatarDataUrl}")`;
+      el.textContent = "";
+    } else {
+      el.style.backgroundImage = "";
+      el.textContent = initial;
+    }
+  }
+
+  function updateAvatarUI() {
+    const initial = username.trim().charAt(0) || "U";
+    applyAvatarToEl(bigAvatar, initial);
+    applyAvatarToEl(headerAvatar, initial);
+    displayName.textContent = username;
+    // bigAvatar berisi tombol edit di dalamnya, pastikan tombol tetap ada setelah textContent direset
+    if (!bigAvatar.querySelector("#avatarEditBtn")) {
+      bigAvatar.appendChild(avatarEditBtn);
+      bigAvatar.appendChild(avatarFileInput);
+    }
+  }
+
+  editNameBtn.addEventListener("click", () => {
+    nameInput.value = username;
+    editNameRow.classList.add("active");
+    nameInput.focus();
+  });
+
+  saveNameBtn.addEventListener("click", () => {
+    const val = nameInput.value.trim();
+    if (val) {
+      username = val;
+      localStorage.setItem("lx_username", username);
+      updateAvatarUI();
+    }
+    editNameRow.classList.remove("active");
+  });
+
+  // ===== AVATAR DARI GALLERY =====
+  const avatarEditBtn = document.getElementById("avatarEditBtn");
+  const avatarFileInput = document.getElementById("avatarFileInput");
+
+  avatarEditBtn.addEventListener("click", () => avatarFileInput.click());
+
+  avatarFileInput.addEventListener("change", () => {
+    const file = avatarFileInput.files && avatarFileInput.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Ukuran foto maksimal 5MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      avatarDataUrl = reader.result;
+      localStorage.setItem("lx_avatar", avatarDataUrl);
+      updateAvatarUI();
+      // Jika user sudah login, simpan avatar ke akun (MongoDB) lewat backend
+      if (isLoggedIn) {
+        fetch("/api/user/avatar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ avatar: avatarDataUrl })
+        }).catch(err => console.error("Gagal menyimpan avatar ke server:", err));
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+
+  nameInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") saveNameBtn.click();
+  });
+
+  // ===== SETTINGS =====
+  document.getElementById("fontSelect").addEventListener("change", e => {
+    document.documentElement.style.setProperty("--font-scale", e.target.value);
+  });
+
+  const enterToggle = document.getElementById("enterToggle");
+  enterToggle.addEventListener("change", e => {
+    enterToSend = e.target.checked;
+    const t = translations[currentLang] || translations.en;
+    inputHint.textContent = enterToSend ? t.hintEnter : t.hintButton;
+  });
+
+  langSelect.addEventListener("change", e => {
+    applyLanguage(e.target.value);
+  });
+
+  // ===== REPORT (mailto) =====
+  document.getElementById("reportBtn").addEventListener("click", () => {
+    const t = translations[currentLang] || translations.en;
+    const subject = encodeURIComponent(t.reportSubject);
+    const body = encodeURIComponent(t.reportBody);
+    window.location.href = `mailto:support@lexerium.ai?subject=${subject}&body=${body}`;
+  });
+
+  // ===== CUSTOMER SERVICE (mailto) =====
+  document.getElementById("csBtn").addEventListener("click", () => {
+    const t = translations[currentLang] || translations.en;
+    const subject = encodeURIComponent(t.csSubject);
+    const body = encodeURIComponent(t.csBody);
+    window.location.href = `mailto:cs@lexerium.ai?subject=${subject}&body=${body}`;
+  });
+
+  // ===== CHAT LOGIC (fungsi inti tidak diubah) =====
+  function addMessage(text, type, opts = {}) {
+    const welcome = document.getElementById("welcome");
+    if (welcome) welcome.remove();
+
+    const t = translations[currentLang] || translations.en;
+
+    const message = document.createElement("div");
+    message.className = "message " + type;
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    if (type === "user" && avatarDataUrl) {
+      avatar.style.backgroundImage = `url("${avatarDataUrl}")`;
+    } else if (type === "ai" && LEXERIUM_AI_AVATAR_URL) {
+      avatar.style.backgroundImage = `url("${LEXERIUM_AI_AVATAR_URL}")`;
+    } else {
+      avatar.textContent = type === "user" ? (username.trim().charAt(0) || "U") : "L";
+    }
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+
+    const senderName = document.createElement("div");
+    senderName.className = "sender-name";
+    senderName.textContent = type === "user" ? username : t.aiName;
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+
+    if (opts.isAudio) {
+      const micTag = document.createElement("div");
+      micTag.className = "mic-tag";
+      micTag.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg> voice message`;
+      bubble.appendChild(micTag);
+    }
+
+    if (opts.imageDataUrl) {
+      const img = document.createElement("img");
+      img.className = "chat-image";
+      img.src = opts.imageDataUrl;
+      img.alt = "attached image";
+      bubble.appendChild(img);
+    }
+
+    if (text) {
+      const textNode = document.createElement("div");
+      textNode.style.whiteSpace = "pre-wrap";
+      textNode.style.overflowWrap = "anywhere";
+      textNode.textContent = text;
+      bubble.appendChild(textNode);
+    }
+
+    content.appendChild(senderName);
+    content.appendChild(bubble);
+
+    message.appendChild(avatar);
+    message.appendChild(content);
+    chatBox.appendChild(message);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function addTyping() {
+    const t = translations[currentLang] || translations.en;
+    const message = document.createElement("div");
+    message.className = "message ai";
+    message.id = "typing";
+    const avatarStyle = LEXERIUM_AI_AVATAR_URL ? ` style="background-image:url('${LEXERIUM_AI_AVATAR_URL}')"` : "";
+    const avatarText = LEXERIUM_AI_AVATAR_URL ? "" : "L";
+    message.innerHTML = `
+      <div class="avatar"${avatarStyle}>${avatarText}</div>
+      <div class="message-content">
+        <div class="sender-name">${t.aiName}</div>
+        <div class="bubble typing-bubble">
+          <div class="typing"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    `;
+    chatBox.appendChild(message);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const prompt = promptInput.value.trim();
+    const imageToSend = pendingImage; // simpan dulu sebelum direset
+    const audioFlag = pendingIsAudio;
+
+    if (!prompt && !imageToSend) return;
+
+    // ===== GATE: wajib login Google setelah 3 pesan gratis =====
+    if (!isLoggedIn && getMsgCount() >= FREE_MESSAGE_LIMIT) {
+      showLoginModal();
+      return;
+    }
+
+    addMessage(prompt, "user", { imageDataUrl: imageToSend, isAudio: audioFlag });
+    if (!isLoggedIn) setMsgCount(getMsgCount() + 1);
+    promptInput.value = "";
+    promptInput.style.height = "43px";
+    clearPendingImage();
+    pendingIsAudio = false;
+    sendButton.disabled = true;
+    addTyping();
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ prompt: prompt, image: imageToSend, isAudio: audioFlag, conversationId: currentConversationId })
+      });
+
+      const data = await response.json();
+
+      const typing = document.getElementById("typing");
+      if (typing) typing.remove();
+
+      if (!data.success) {
+        if (data.requireLogin) {
+          showLoginModal();
+          return;
+        }
+        addMessage("Error: " + data.message, "ai");
+        return;
+      }
+
+      if (data.conversationId && !currentConversationId) {
+        currentConversationId = data.conversationId;
+        loadConversationList(); // supaya percakapan baru langsung muncul di sidebar
+      }
+
+      addMessage(data.response, "ai");
+
+    } catch (error) {
+      const typing = document.getElementById("typing");
+      if (typing) typing.remove();
+
+      const t = translations[currentLang] || translations.en;
+      addMessage(t.errorConn, "ai");
+      console.error(error);
+    } finally {
+      sendButton.disabled = false;
+      promptInput.focus();
+    }
+  }
+
+  sendButton.addEventListener("click", sendMessage);
+
+  promptInput.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      if (enterToSend) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+  });
+
+  promptInput.addEventListener("input", () => {
+    promptInput.style.height = "43px";
+    promptInput.style.height = Math.min(promptInput.scrollHeight, 130) + "px";
+  });
+
+  // ===== KUNCI LAYAR SAAT KEYBOARD MUNCUL (mencegah efek "zoom"/layar bergeser) =====
+  function lockViewportToKeyboard() {
+    if (!window.visualViewport) return;
+
+    function handleViewportChange() {
+      const vh = window.visualViewport.height;
+      appRoot.style.height = vh + "px";
+      window.scrollTo(0, 0);
+    }
+
+    window.visualViewport.addEventListener("resize", handleViewportChange);
+    window.visualViewport.addEventListener("scroll", handleViewportChange);
+  }
+
+  promptInput.addEventListener("focus", () => {
+    window.scrollTo(0, 0);
+  });
+
+  nameInput.addEventListener("focus", () => {
+    window.scrollTo(0, 0);
+  });
+
+  lockViewportToKeyboard();
+
+  // ===== LOGIN GOOGLE =====
+  const loginOverlay = document.getElementById("loginOverlay");
+
+  function showLoginModal() {
+    loginOverlay.classList.add("active");
+  }
+  function hideLoginModal() {
+    loginOverlay.classList.remove("active");
+  }
+
+  function initGoogleSignIn() {
+    if (!window.google || !google.accounts || !google.accounts.id) {
+      // Google script belum siap, coba lagi sebentar
+      setTimeout(initGoogleSignIn, 300);
+      return;
+    }
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential
+    });
+    google.accounts.id.renderButton(
+      document.getElementById("googleSignInBtn"),
+      { theme: "filled_blue", size: "large", width: 260 }
+    );
+    const accountBtnContainer = document.getElementById("googleSignInBtnAccount");
+    if (accountBtnContainer) {
+      google.accounts.id.renderButton(accountBtnContainer, { theme: "filled_blue", size: "large", width: 240 });
+    }
+  }
+
+  async function handleGoogleCredential(response) {
+    try {
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // penting: agar cookie sesi dari backend tersimpan
+        body: JSON.stringify({ credential: response.credential })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        alert("Login gagal: " + (data.message || "silakan coba lagi."));
+        return;
+      }
+      applyLoggedInUser(data.user);
+      hideLoginModal();
+    } catch (err) {
+      console.error(err);
+      alert("Tidak bisa terhubung ke server untuk login.");
+    }
+  }
+
+  function applyLoggedInUser(user) {
+    isLoggedIn = true;
+    currentUser = user;
+    setMsgCount(0);
+    if (user.name) {
+      username = user.name;
+      localStorage.setItem("lx_username", username);
+    }
+    if (user.avatar) {
+      avatarDataUrl = user.avatar;
+      localStorage.setItem("lx_avatar", avatarDataUrl);
+    }
+    updateAvatarUI();
+    updateAccountPanelUI();
+    loadConversationList();
+  }
+
+  // Cek apakah user sudah punya sesi login aktif (cookie) saat halaman dibuka
+  async function checkExistingSession() {
+    try {
+      const res = await fetch("/api/auth/me", { credentials: "include" });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.success && data.user) {
+        applyLoggedInUser(data.user);
+      }
+    } catch (err) {
+      // tidak apa-apa jika gagal, anggap belum login
+    }
+  }
+
+  initGoogleSignIn();
+  checkExistingSession();
+
+  // init
+  updateAvatarUI();
+  updateAccountPanelUI();
+  applyLanguage(currentLang);
+</script>
+
+</body>
+</html>
